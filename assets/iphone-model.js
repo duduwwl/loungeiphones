@@ -210,14 +210,30 @@ function makeScreenTexture() {
 }
 
 function makeBackMark() {
-  const material = new THREE.MeshBasicMaterial({ color: 0x333740, side: THREE.DoubleSide });
   const mark = new THREE.Group();
-  const main = new THREE.Mesh(new THREE.CircleGeometry(0.11, 48), material);
-  main.scale.set(1.05, 1.15, 1);
-  mark.add(main);
-  const leaf = new THREE.Mesh(new THREE.CircleGeometry(0.045, 32), material);
-  leaf.position.set(0.07, 0.14, 0);
-  leaf.rotation.z = 0.65;
+  const material = new THREE.MeshBasicMaterial({ color: 0x353943, side: THREE.DoubleSide });
+  const silhouette = new THREE.Shape();
+  silhouette.moveTo(-0.025, 0.17);
+  silhouette.bezierCurveTo(-0.085, 0.11, -0.135, 0.16, -0.17, 0.075);
+  silhouette.bezierCurveTo(-0.225, -0.06, -0.18, -0.19, -0.105, -0.2);
+  silhouette.bezierCurveTo(-0.045, -0.21, -0.02, -0.17, 0.025, -0.17);
+  silhouette.bezierCurveTo(0.075, -0.17, 0.095, -0.205, 0.15, -0.195);
+  silhouette.bezierCurveTo(0.225, -0.18, 0.245, -0.095, 0.205, -0.035);
+  silhouette.bezierCurveTo(0.18, 0.005, 0.16, 0.045, 0.195, 0.08);
+  silhouette.bezierCurveTo(0.16, 0.15, 0.11, 0.17, 0.075, 0.15);
+  silhouette.bezierCurveTo(0.035, 0.13, 0.015, 0.18, -0.025, 0.17);
+  const bite = new THREE.Path();
+  bite.absellipse(0.205, 0.105, 0.055, 0.048, 0, Math.PI * 2, false, 0);
+  silhouette.holes.push(bite);
+  const apple = new THREE.Mesh(new THREE.ShapeGeometry(silhouette, 24), material);
+  mark.add(apple);
+
+  const leafShape = new THREE.Shape();
+  leafShape.moveTo(0.015, 0.22);
+  leafShape.bezierCurveTo(0.018, 0.285, 0.085, 0.305, 0.14, 0.29);
+  leafShape.bezierCurveTo(0.13, 0.235, 0.07, 0.205, 0.015, 0.22);
+  const leaf = new THREE.Mesh(new THREE.ShapeGeometry(leafShape, 12), material);
+  leaf.rotation.z = 0.15;
   mark.add(leaf);
   return mark;
 }
