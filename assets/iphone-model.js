@@ -106,23 +106,29 @@ if (renderer) {
   let dragging = false;
   let lastX = 0;
   let lastY = 0;
+  let lastMoveAt = 0;
   let velocity = 0;
   canvas.addEventListener('pointerdown', event => {
+    event.preventDefault();
     dragging = true;
     lastX = event.clientX;
     lastY = event.clientY;
-    canvas.setPointerCapture(event.pointerId);
+    lastMoveAt = event.timeStamp;
+    canvas.focus({ preventScroll: true });
+    if (canvas.setPointerCapture) canvas.setPointerCapture(event.pointerId);
     canvas.classList.add('is-dragging');
   });
   canvas.addEventListener('pointermove', event => {
     if (!dragging) return;
     const dx = event.clientX - lastX;
     const dy = event.clientY - lastY;
-    phone.rotation.y += dx * 0.009;
-    phone.rotation.x = THREE.MathUtils.clamp(phone.rotation.x + dy * 0.006, -0.7, 0.7);
-    velocity = dx * 0.00012;
+    const rotationDelta = (dx - dy) * 0.024;
+    phone.rotation.y += rotationDelta;
+    phone.rotation.x = THREE.MathUtils.clamp(phone.rotation.x + dy * 0.0035, -0.7, 0.7);
+    velocity = rotationDelta / Math.max(8, event.timeStamp - lastMoveAt);
     lastX = event.clientX;
     lastY = event.clientY;
+    lastMoveAt = event.timeStamp;
   });
   const endDrag = () => {
     dragging = false;
@@ -131,6 +137,14 @@ if (renderer) {
   canvas.addEventListener('pointerup', endDrag);
   canvas.addEventListener('pointercancel', endDrag);
   canvas.addEventListener('lostpointercapture', endDrag);
+  canvas.addEventListener('keydown', event => {
+    const turns = { ArrowLeft: 0.42, ArrowRight: -0.42, ArrowUp: 0.18, ArrowDown: -0.18 };
+    if (!(event.key in turns)) return;
+    event.preventDefault();
+    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') phone.rotation.x = THREE.MathUtils.clamp(phone.rotation.x + turns[event.key], -0.7, 0.7);
+    else phone.rotation.y += turns[event.key];
+    velocity = 0;
+  });
 
   let inView = true;
   const visibility = new IntersectionObserver(([entry]) => { inView = entry.isIntersecting; });
@@ -142,10 +156,10 @@ if (renderer) {
     previous = now;
     if (document.hidden || !inView || !width) return;
     if (!dragging) {
-      if (!reducedMotion) phone.rotation.y += delta * (Math.PI * 2 / 14000);
+      if (!reducedMotion) phone.rotation.y += delta * (Math.PI * 2 / 10000);
       if (Math.abs(velocity) > 0.00001) {
         phone.rotation.y += velocity * delta;
-        velocity *= 0.94;
+        velocity *= 0.9;
       }
       phone.rotation.x += (-0.11 - phone.rotation.x) * Math.min(1, delta * 0.0025);
     }
