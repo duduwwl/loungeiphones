@@ -104,13 +104,16 @@ if (renderer) {
   resize();
 
   let dragging = false;
+  let manuallyControlled = false;
   let lastX = 0;
   let lastY = 0;
   let lastMoveAt = 0;
   let velocity = 0;
   canvas.addEventListener('pointerdown', event => {
+    if (event.button !== undefined && event.button !== 0) return;
     event.preventDefault();
     dragging = true;
+    manuallyControlled = true;
     lastX = event.clientX;
     lastY = event.clientY;
     lastMoveAt = event.timeStamp;
@@ -122,9 +125,9 @@ if (renderer) {
     if (!dragging) return;
     const dx = event.clientX - lastX;
     const dy = event.clientY - lastY;
-    const rotationDelta = (dx - dy) * 0.024;
+    const rotationDelta = dx * 0.018;
     phone.rotation.y += rotationDelta;
-    phone.rotation.x = THREE.MathUtils.clamp(phone.rotation.x + dy * 0.0035, -0.7, 0.7);
+    phone.rotation.x = THREE.MathUtils.clamp(phone.rotation.x + dy * 0.014, -0.95, 0.95);
     velocity = rotationDelta / Math.max(8, event.timeStamp - lastMoveAt);
     lastX = event.clientX;
     lastY = event.clientY;
@@ -141,9 +144,18 @@ if (renderer) {
     const turns = { ArrowLeft: 0.42, ArrowRight: -0.42, ArrowUp: 0.18, ArrowDown: -0.18 };
     if (!(event.key in turns)) return;
     event.preventDefault();
-    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') phone.rotation.x = THREE.MathUtils.clamp(phone.rotation.x + turns[event.key], -0.7, 0.7);
+    manuallyControlled = true;
+    if (event.key === 'ArrowUp' || event.key === 'ArrowDown') phone.rotation.x = THREE.MathUtils.clamp(phone.rotation.x + turns[event.key], -0.95, 0.95);
     else phone.rotation.y += turns[event.key];
     velocity = 0;
+  });
+  stage.querySelectorAll('[data-phone-turn]').forEach(button => {
+    button.addEventListener('click', () => {
+      manuallyControlled = true;
+      velocity = 0;
+      phone.rotation.y += Number(button.dataset.phoneTurn) * Math.PI / 3;
+      canvas.focus({ preventScroll: true });
+    });
   });
 
   let inView = true;
@@ -156,7 +168,7 @@ if (renderer) {
     previous = now;
     if (document.hidden || !inView || !width) return;
     if (!dragging) {
-      if (!reducedMotion) phone.rotation.y += delta * (Math.PI * 2 / 10000);
+      if (!reducedMotion && !manuallyControlled) phone.rotation.y += delta * (Math.PI * 2 / 10000);
       if (Math.abs(velocity) > 0.00001) {
         phone.rotation.y += velocity * delta;
         velocity *= 0.9;
