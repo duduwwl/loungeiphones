@@ -36,8 +36,9 @@ if (renderer) {
 
   const phone = new THREE.Group();
   scene.add(phone);
-  const metal = new THREE.MeshPhysicalMaterial({ color: 0x252830, metalness: 0.92, roughness: 0.24, clearcoat: 0.8, clearcoatRoughness: 0.2 });
+  const metal = new THREE.MeshPhysicalMaterial({ color: 0x292b30, metalness: 0.96, roughness: 0.2, clearcoat: 0.65, clearcoatRoughness: 0.18 });
   const blackGlass = new THREE.MeshPhysicalMaterial({ color: 0x080a0f, metalness: 0.35, roughness: 0.16, clearcoat: 1, clearcoatRoughness: 0.08 });
+  const rearFinish = new THREE.MeshPhysicalMaterial({ color: 0x1a1b1e, metalness: 0.08, roughness: 0.3, clearcoat: 0.14, clearcoatRoughness: 0.34 });
   const screenMaterial = new THREE.MeshPhysicalMaterial({ map: makeScreenTexture(), metalness: 0.12, roughness: 0.18, clearcoat: 1, clearcoatRoughness: 0.08, side: THREE.DoubleSide });
   const body = new THREE.Mesh(new RoundedBoxGeometry(1.18, 2.48, 0.145, 8, 0.105), metal);
   phone.add(body);
@@ -45,7 +46,7 @@ if (renderer) {
   const front = new THREE.Mesh(new RoundedBoxGeometry(1.105, 2.385, 0.014, 8, 0.085), screenMaterial);
   front.position.z = 0.077;
   phone.add(front);
-  const rearGlass = new THREE.Mesh(new RoundedBoxGeometry(1.105, 2.385, 0.014, 8, 0.085), blackGlass);
+  const rearGlass = new THREE.Mesh(new RoundedBoxGeometry(1.105, 2.385, 0.014, 8, 0.085), rearFinish);
   rearGlass.position.z = -0.077;
   rearGlass.rotation.y = Math.PI;
   phone.add(rearGlass);
@@ -65,18 +66,21 @@ if (renderer) {
 
   // The camera island sits on the rear face and is built from separate metal, glass and lens layers.
   const cameraBlock = new THREE.Group();
-  cameraBlock.position.set(-0.31, 0.79, -0.091);
+  cameraBlock.position.set(0.31, 0.79, -0.091);
   cameraBlock.rotation.y = Math.PI;
   phone.add(cameraBlock);
-  const bump = new THREE.Mesh(new RoundedBoxGeometry(0.61, 0.72, 0.09, 6, 0.105), new THREE.MeshPhysicalMaterial({ color: 0x171a20, metalness: 0.82, roughness: 0.27, clearcoat: 0.75 }));
+  const bump = new THREE.Mesh(new RoundedBoxGeometry(0.61, 0.72, 0.045, 10, 0.105), new THREE.MeshPhysicalMaterial({ color: 0x202226, metalness: 0.72, roughness: 0.28, clearcoat: 0.35, clearcoatRoughness: 0.26 }));
   cameraBlock.add(bump);
-  for (const [x, y] of [[-0.17, 0.2], [0.17, 0.2], [-0.17, -0.18]]) addLens(cameraBlock, x, y);
+  for (const [x, y] of [[-0.17, 0.2], [-0.17, -0.18], [0.17, 0.01]]) addLens(cameraBlock, x, y);
   const flash = new THREE.Mesh(new THREE.CircleGeometry(0.055, 32), new THREE.MeshBasicMaterial({ color: 0xfff2d8 }));
-  flash.position.set(0.175, -0.18, 0.052);
+  flash.position.set(0.19, 0.19, 0.052);
   cameraBlock.add(flash);
   const mic = new THREE.Mesh(new THREE.CircleGeometry(0.021, 20), new THREE.MeshBasicMaterial({ color: 0x08090c }));
-  mic.position.set(0.175, -0.04, 0.053);
+  mic.position.set(0.19, 0.03, 0.053);
   cameraBlock.add(mic);
+  const lidar = new THREE.Mesh(new THREE.CircleGeometry(0.047, 32), new THREE.MeshBasicMaterial({ color: 0x08090c }));
+  lidar.position.set(0.19, -0.18, 0.053);
+  cameraBlock.add(lidar);
 
   const logo = makeBackMark();
   logo.position.set(0, -0.08, -0.087);
@@ -236,30 +240,15 @@ function makeScreenTexture() {
 }
 
 function makeBackMark() {
-  const mark = new THREE.Group();
-  const material = new THREE.MeshBasicMaterial({ color: 0x353943, side: THREE.DoubleSide });
-  const silhouette = new THREE.Shape();
-  silhouette.moveTo(-0.025, 0.17);
-  silhouette.bezierCurveTo(-0.085, 0.11, -0.135, 0.16, -0.17, 0.075);
-  silhouette.bezierCurveTo(-0.225, -0.06, -0.18, -0.19, -0.105, -0.2);
-  silhouette.bezierCurveTo(-0.045, -0.21, -0.02, -0.17, 0.025, -0.17);
-  silhouette.bezierCurveTo(0.075, -0.17, 0.095, -0.205, 0.15, -0.195);
-  silhouette.bezierCurveTo(0.225, -0.18, 0.245, -0.095, 0.205, -0.035);
-  silhouette.bezierCurveTo(0.18, 0.005, 0.16, 0.045, 0.195, 0.08);
-  silhouette.bezierCurveTo(0.16, 0.15, 0.11, 0.17, 0.075, 0.15);
-  silhouette.bezierCurveTo(0.035, 0.13, 0.015, 0.18, -0.025, 0.17);
-  const bite = new THREE.Path();
-  bite.absellipse(0.205, 0.105, 0.055, 0.048, 0, Math.PI * 2, false, 0);
-  silhouette.holes.push(bite);
-  const apple = new THREE.Mesh(new THREE.ShapeGeometry(silhouette, 24), material);
-  mark.add(apple);
-
-  const leafShape = new THREE.Shape();
-  leafShape.moveTo(0.015, 0.22);
-  leafShape.bezierCurveTo(0.018, 0.285, 0.085, 0.305, 0.14, 0.29);
-  leafShape.bezierCurveTo(0.13, 0.235, 0.07, 0.205, 0.015, 0.22);
-  const leaf = new THREE.Mesh(new THREE.ShapeGeometry(leafShape, 12), material);
-  leaf.rotation.z = 0.15;
-  mark.add(leaf);
-  return mark;
+  const logoCanvas = document.createElement('canvas');
+  logoCanvas.width = 384;
+  logoCanvas.height = 512;
+  const context = logoCanvas.getContext('2d');
+  context.fillStyle = '#65676c';
+  const applePath = new Path2D('M318.7 268.7c-.2-37.7 16.8-66.1 50.9-86.9-19.1-27.3-47.9-42.3-85.9-45.2-36-2.8-75.3 21-89.6 21-15.1 0-49.9-20-77.5-20C59.6 138.1 4 178.8 4 259.5c0 23.8 4.4 48.4 13.2 73.9 11.8 34.1 54.4 117.6 98.9 116.1 24.6-.6 42-17.5 75.4-17.5 32.4 0 48.5 17.5 75.4 17.5 44.9-.7 83.4-76.7 94.6-111-60.1-28.3-64.4-68.1-64.8-69.8zm-60.9-169C282.5 74.1 300.6 43 297.1 12c-29 2-62.7 21.3-81.8 44.8-16.7 20.3-31.4 51.6-27.4 82.1 31.3 2.4 61.9-13.7 70-39.2z');
+  context.fill(applePath);
+  const texture = new THREE.CanvasTexture(logoCanvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true, opacity: 0.46, side: THREE.DoubleSide, toneMapped: false });
+  return new THREE.Mesh(new THREE.PlaneGeometry(0.2, 0.267), material);
 }
