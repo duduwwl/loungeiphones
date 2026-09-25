@@ -255,6 +255,6 @@
     }
     document.querySelectorAll('a[target="_blank"]').forEach(link=>link.rel='noopener noreferrer');
   </script>
-  <script>import('./assets/iphone-model.js?v=4').catch(error=>console.error('Não foi possível iniciar o iPhone 3D.',error));</script>
+  <script>Promise.all(['./assets/iphone-model.js?v=5','./assets/vendor/three.module.js','./assets/vendor/RoundedBoxGeometry.js'].map(url=>fetch(url).then(response=>console.info('iPhone 3D asset',url,response.status,response.headers.get('content-type'))).catch(error=>console.error('iPhone 3D asset error',url,error))));import('./assets/iphone-model.js?v=5').catch(error=>console.error('Não foi possível iniciar o iPhone 3D.',error));</script>
 </body>
 </html>
