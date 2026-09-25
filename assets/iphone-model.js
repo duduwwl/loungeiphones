@@ -38,7 +38,7 @@ if (renderer) {
   scene.add(phone);
   const metal = new THREE.MeshPhysicalMaterial({ color: 0x292b30, metalness: 0.96, roughness: 0.2, clearcoat: 0.65, clearcoatRoughness: 0.18 });
   const blackGlass = new THREE.MeshPhysicalMaterial({ color: 0x080a0f, metalness: 0.35, roughness: 0.16, clearcoat: 1, clearcoatRoughness: 0.08 });
-  const rearFinish = new THREE.MeshPhysicalMaterial({ color: 0x1a1b1e, metalness: 0.08, roughness: 0.3, clearcoat: 0.14, clearcoatRoughness: 0.34 });
+  const rearFinish = new THREE.MeshPhysicalMaterial({ color: 0x16171a, metalness: 0.08, roughness: 0.32, clearcoat: 0.12, clearcoatRoughness: 0.36 });
   const screenMaterial = new THREE.MeshPhysicalMaterial({ map: makeScreenTexture(), metalness: 0.12, roughness: 0.18, clearcoat: 1, clearcoatRoughness: 0.08, side: THREE.DoubleSide });
   const body = new THREE.Mesh(new RoundedBoxGeometry(1.18, 2.48, 0.145, 8, 0.105), metal);
   phone.add(body);
@@ -58,10 +58,10 @@ if (renderer) {
   selfieLens.position.set(0.125, 1.105, 0.102);
   phone.add(selfieLens);
 
-  addSideButton(phone, -0.604, 0.64, 0.08, 0.34, metal);
-  addSideButton(phone, -0.604, 0.20, 0.08, 0.25, metal);
-  addSideButton(phone, -0.604, -0.12, 0.08, 0.25, metal);
-  addSideButton(phone, 0.604, 0.48, 0.08, 0.48, metal);
+  addSideButton(phone, -0.59, 0.64, 0.08, 0.34, metal);
+  addSideButton(phone, -0.59, 0.20, 0.08, 0.25, metal);
+  addSideButton(phone, -0.59, -0.12, 0.08, 0.25, metal);
+  addSideButton(phone, 0.59, 0.48, 0.08, 0.4, metal);
   addSideButton(phone, 0, -1.225, 0.12, 0.055, metal, true);
 
   // The camera island sits on the rear face and is built from separate metal, glass and lens layers.
@@ -185,7 +185,7 @@ if (renderer) {
 }
 
 function addSideButton(parent, x, y, z, height, material, bottom = false) {
-  const geometry = new RoundedBoxGeometry(bottom ? 0.23 : 0.055, bottom ? 0.055 : height, bottom ? 0.09 : 0.075, 4, 0.024);
+  const geometry = new RoundedBoxGeometry(bottom ? 0.23 : 0.042, bottom ? 0.055 : height, bottom ? 0.09 : 0.06, 4, 0.02);
   const button = new THREE.Mesh(geometry, material);
   button.position.set(x, y, bottom ? z : 0);
   if (bottom) {
@@ -197,16 +197,16 @@ function addSideButton(parent, x, y, z, height, material, bottom = false) {
 }
 
 function addLens(parent, x, y) {
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.115, 0.018, 10, 40), new THREE.MeshStandardMaterial({ color: 0x414650, metalness: 0.95, roughness: 0.2 }));
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(0.108, 0.012, 10, 40), new THREE.MeshStandardMaterial({ color: 0x24272d, metalness: 0.9, roughness: 0.27 }));
   ring.position.set(x, y, 0.05);
   parent.add(ring);
-  const outer = new THREE.Mesh(new THREE.CircleGeometry(0.098, 40), new THREE.MeshStandardMaterial({ color: 0x070a11, metalness: 0.5, roughness: 0.17, side: THREE.DoubleSide }));
+  const outer = new THREE.Mesh(new THREE.CircleGeometry(0.098, 40), new THREE.MeshStandardMaterial({ color: 0x07080b, metalness: 0.4, roughness: 0.2, side: THREE.DoubleSide }));
   outer.position.set(x, y, 0.052);
   parent.add(outer);
-  const lens = new THREE.Mesh(new THREE.CircleGeometry(0.061, 40), new THREE.MeshPhysicalMaterial({ color: 0x15263e, metalness: 0.75, roughness: 0.08, clearcoat: 1, side: THREE.DoubleSide }));
+  const lens = new THREE.Mesh(new THREE.CircleGeometry(0.061, 40), new THREE.MeshPhysicalMaterial({ color: 0x101722, metalness: 0.58, roughness: 0.12, clearcoat: 1, side: THREE.DoubleSide }));
   lens.position.set(x, y, 0.054);
   parent.add(lens);
-  const glint = new THREE.Mesh(new THREE.CircleGeometry(0.018, 24), new THREE.MeshBasicMaterial({ color: 0x9cc6ff, side: THREE.DoubleSide }));
+  const glint = new THREE.Mesh(new THREE.CircleGeometry(0.013, 24), new THREE.MeshBasicMaterial({ color: 0x586780, transparent: true, opacity: 0.62, side: THREE.DoubleSide }));
   glint.position.set(x - 0.018, y + 0.02, 0.056);
   parent.add(glint);
 }
