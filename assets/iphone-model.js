@@ -1,5 +1,5 @@
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js';
-import { RoundedBoxGeometry } from 'https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/geometries/RoundedBoxGeometry.js';
+import * as THREE from './vendor/three.module.js';
+import { RoundedBoxGeometry } from './vendor/RoundedBoxGeometry.js';
 
 const stage = document.getElementById('phoneStage');
 const canvas = document.getElementById('phoneCanvas');
