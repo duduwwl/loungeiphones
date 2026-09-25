@@ -255,6 +255,6 @@
     }
     document.querySelectorAll('a[target="_blank"]').forEach(link=>link.rel='noopener noreferrer');
   </script>
-  <script type="module" src="assets/iphone-model.js?v=3"></script>
+  <script>import('./assets/iphone-model.js?v=4').catch(error=>console.error('Não foi possível iniciar o iPhone 3D.',error));</script>
 </body>
 </html>
